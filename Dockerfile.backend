@@ -2,11 +2,19 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 COPY backend ./backend
 WORKDIR /app/backend
+
+# Install backend deps and build all microservices
 RUN npm install
 RUN npx nx run-many --target=build --all
 
+# -------------------------------------------
+
 FROM node:18-alpine AS runner
 WORKDIR /app
-COPY --from=builder /app/backend/dist ./dist
+
+# ✅ Fix is here: copy the actual Nx output path
+COPY --from=builder /app/backend/dist/apps ./dist/apps
 COPY backend/package.json .
-# The entrypoint is overridden by docker-compose `command`
+
+# You will override this in docker-compose.yml
+# Example command: node dist/apps/api-gateway/main.js

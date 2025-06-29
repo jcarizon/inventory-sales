@@ -1,18 +1,19 @@
 version: '3.8'
 
 services:
-  # 🧠 Backend API Gateway
+  # 🧠 Backend API Gateway (NestJS)
   api-gateway:
     build:
       context: .
       dockerfile: Dockerfile.backend
     container_name: api-gateway
+    command: node dist/apps/api-gateway/main.js
     ports:
       - "3001:3001"
     restart: unless-stopped
-    depends_on: []  # You can add microservices like [users, auth] here later
+    depends_on: []  # Add microservices like users, auth here
 
-  # 🌐 Frontend (Nuxt)
+  # 🌐 Frontend (Nuxt 3)
   frontend:
     build:
       context: .
@@ -29,7 +30,7 @@ services:
     image: nginx:stable-alpine
     container_name: nginx
     volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     ports:
       - "80:80"
     depends_on:
