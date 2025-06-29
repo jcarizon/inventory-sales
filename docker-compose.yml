@@ -5,19 +5,19 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: Dockerfile.backend
+      dockerfile: backend/Dockerfile.backend  # ✅ Correct location
     container_name: api-gateway
-    command: node dist/apps/api-gateway/main.js
+    command: node dist/apps/api-gateway/main.js  # ✅ Ensure this file exists
     ports:
       - "3001:3001"
     restart: unless-stopped
-    depends_on: []  # Add microservices like users, auth here
+    depends_on: []
 
   # 🌐 Frontend (Nuxt 3)
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: frontend/Dockerfile.frontend  # ✅ Correct location
     container_name: frontend
     ports:
       - "3000:3000"

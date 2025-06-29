@@ -1,6 +1,4 @@
-# Dockerfile.frontend
-
-# Base stage
+# Build Stage
 FROM node:20-alpine AS builder
 WORKDIR /app
 
@@ -10,12 +8,16 @@ RUN npm install
 COPY frontend ./
 RUN npm run build
 
-# Production image
-FROM node:20-alpine
+# Runtime Stage
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-COPY --from=builder /app ./
+# Only copy the necessary output
+COPY --from=builder /app/.output ./.output
+COPY --from=builder /app/package*.json ./
+
+ENV NODE_ENV production
 ENV HOST 0.0.0.0
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["node", ".output/server/index.mjs"]
