@@ -1,4 +1,23 @@
 # -----------------------------
+# 🚧 Build Stage
+# -----------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy the full backend monorepo
+COPY backend ./backend
+
+# Move into backend folder
+WORKDIR /app/backend
+
+# Install dependencies
+RUN npm install
+
+# Build all NestJS apps/libs using Nx
+RUN npx nx run-many --target=build --all
+
+# -----------------------------
 # 🚀 Runtime Stage
 # -----------------------------
 FROM node:20-alpine AS runner
@@ -11,14 +30,14 @@ COPY --from=builder /app/backend/node_modules ./node_modules
 # ✅ Copy built dist files
 COPY --from=builder /app/backend/dist ./dist
 
-# (optional) Copy shared libs if needed
-# COPY --from=builder /app/backend/libs ./libs
-
-# ✅ Copy package.json (optional)
+# ✅ Copy the package files (optional)
 COPY backend/package*.json ./
 
+# Set environment
 ENV NODE_ENV=production
-EXPOSE 3000
 
-# ❗ Set this per microservice in docker-compose
+# Expose port
+EXPOSE 3001
+
+# ✅ Dynamically start microservice via Docker Compose
 CMD ["node", "dist/apps/api-gateway/main.js"]

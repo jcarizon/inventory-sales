@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # 🧠 Backend API Gateway (NestJS)
   api-gateway:
