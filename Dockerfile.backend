@@ -1,0 +1,21 @@
+# Dockerfile.backend
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY backend/package*.json ./backend/
+
+# Install dependencies
+WORKDIR /app/backend
+RUN npm install
+
+# Copy entire backend workspace
+COPY backend ./backend
+
+# Build the app (only api-gateway)
+RUN npm run build api-gateway
+
+# Expose and run only the api-gateway
+CMD ["node", "dist/apps/api-gateway/main.js"]
