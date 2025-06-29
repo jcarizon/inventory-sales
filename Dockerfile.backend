@@ -1,45 +1,24 @@
 # -----------------------------
-# 🚧 Build Stage
-# -----------------------------
-FROM node:20-alpine AS builder
-
-# Set working directory inside the container
-WORKDIR /app
-
-# Copy the full backend monorepo
-COPY backend ./backend
-
-# Move into backend
-WORKDIR /app/backend
-
-# Install dependencies
-RUN npm install
-
-# Build all apps and libs with Nx
-RUN npx nx run-many --target=build --all
-
-# -----------------------------
 # 🚀 Runtime Stage
 # -----------------------------
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# ✅ Copy ALL built outputs
+# ✅ Copy node_modules from builder
+COPY --from=builder /app/backend/node_modules ./node_modules
+
+# ✅ Copy built dist files
 COPY --from=builder /app/backend/dist ./dist
 
-# Optionally copy shared assets/libs if you use any
+# (optional) Copy shared libs if needed
 # COPY --from=builder /app/backend/libs ./libs
 
-# Copy root package files (in case needed by the app)
+# ✅ Copy package.json (optional)
 COPY backend/package*.json ./
 
-# Set environment
 ENV NODE_ENV=production
-
-# EXPOSE port if needed (or handle per service in compose)
 EXPOSE 3000
 
-# ❗ Set the entrypoint dynamically in docker-compose
-# This is just a fallback default
+# ❗ Set this per microservice in docker-compose
 CMD ["node", "dist/apps/api-gateway/main.js"]
