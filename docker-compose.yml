@@ -5,7 +5,7 @@ services:
   api-gateway:
     build:
       context: .
-      dockerfile: backend/Dockerfile.backend  # ✅ Correct location
+      dockerfile: Dockerfile.backend  # ✅ Correct location
     container_name: api-gateway
     command: node dist/apps/api-gateway/main.js  # ✅ Ensure this file exists
     ports:
@@ -17,7 +17,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: frontend/Dockerfile.frontend  # ✅ Correct location
+      dockerfile: Dockerfile.frontend  # ✅ Correct location
     container_name: frontend
     ports:
       - "3000:3000"
