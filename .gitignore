@@ -1,0 +1,73 @@
+# --- General Node ---
+node_modules/
+dist/
+*.log
+.env
+.env.*
+.npmrc
+pnpm-lock.yaml
+yarn.lock
+aws-access.txt
+cli-user_accessKeys.csv
+inventory-sales.pem
+
+# --- Frontend (Nuxt 3) ---
+/frontend/.nuxt
+/frontend/.output
+/frontend/.vercel
+/frontend/.cache
+/frontend/.eslintcache
+/frontend/.vite
+/frontend/public/build
+/frontend/.storybook
+
+# Optional Nuxt static builds
+/frontend/dist
+
+# --- Backend (NestJS with Nx) ---
+/backend/dist
+/backend/.turbo
+/backend/.nx/cache
+/backend/apps/**/dist
+/backend/libs/**/dist
+
+# --- Nx Monorepo ---
+.cache/
+tmp/
+coverage/
+test-results/
+.nx/
+nx-report.json
+
+# --- Docker ---
+**/Dockerfile
+**/docker-compose.yml
+**/*.local.yml
+**/*.env
+
+# --- OS & Editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Logs ---
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# --- Others (optional) ---
+*.tgz
+*.pid
+*.seed
+*.dump
+*.sqlite
+*.sqlite3
+*.pem
+*.crt
+*.key
