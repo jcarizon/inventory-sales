@@ -3,41 +3,41 @@
 # -----------------------------
 FROM node:20-alpine AS builder
 
+ARG SERVICE=api-gateway
+
 WORKDIR /app
 
-# Copy the full backend monorepo
+# Copy the full monorepo
 COPY backend ./backend
 
-# Move into backend folder
+# Go into backend dir
 WORKDIR /app/backend
 
 # Install dependencies
 RUN npm install
 
-# Build all NestJS apps/libs using Nx
-RUN npx nx run-many --target=build --all
+# Build only the target app
+RUN npx nx build $SERVICE
 
 # -----------------------------
 # 🚀 Runtime Stage
 # -----------------------------
 FROM node:20-alpine AS runner
 
+ARG SERVICE=api-gateway
+
+# Final container workdir
 WORKDIR /app
 
-# ✅ Copy node_modules from builder
+# ✅ Copy runtime artifacts
 COPY --from=builder /app/backend/node_modules ./node_modules
+COPY --from=builder /app/backend/dist/apps/${SERVICE} ./dist
 
-# ✅ Copy built dist files
-COPY --from=builder /app/backend/dist ./dist
-
-# ✅ Copy the package files (optional)
+# If you need runtime config or versioning info
 COPY backend/package*.json ./
 
-# Set environment
 ENV NODE_ENV=production
+EXPOSE 3000
 
-# Expose port
-EXPOSE 3001
-
-# ✅ Dynamically start microservice via Docker Compose
-CMD ["node", "dist/apps/api-gateway/main.js"]
+# ✅ Run app from inside its dist folder
+CMD ["node", "dist/main.js"]
