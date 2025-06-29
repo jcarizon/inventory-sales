@@ -1,21 +1,12 @@
-# Dockerfile.backend
-
-FROM node:20-alpine
-
+FROM node:18-alpine AS builder
 WORKDIR /app
-
-# Copy package files
-COPY backend/package*.json ./backend/
-
-# Install dependencies
+COPY backend ./backend
 WORKDIR /app/backend
 RUN npm install
+RUN npx nx run-many --target=build --all
 
-# Copy entire backend workspace
-COPY backend ./backend
-
-# Build the app (only api-gateway)
-RUN npm run build api-gateway
-
-# Expose and run only the api-gateway
-CMD ["node", "dist/apps/api-gateway/main.js"]
+FROM node:18-alpine AS runner
+WORKDIR /app
+COPY --from=builder /app/backend/dist ./dist
+COPY backend/package.json .
+# The entrypoint is overridden by docker-compose `command`

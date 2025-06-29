@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # 🧠 Backend API Gateway
   api-gateway:
     build:
       context: .
@@ -9,7 +10,9 @@ services:
     ports:
       - "3001:3001"
     restart: unless-stopped
+    depends_on: []  # You can add microservices like [users, auth] here later
 
+  # 🌐 Frontend (Nuxt)
   frontend:
     build:
       context: .
@@ -18,7 +21,10 @@ services:
     ports:
       - "3000:3000"
     restart: unless-stopped
+    depends_on:
+      - api-gateway
 
+  # 🌍 Nginx Reverse Proxy
   nginx:
     image: nginx:stable-alpine
     container_name: nginx
@@ -27,5 +33,6 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - api-gateway
       - frontend
+      - api-gateway
+    restart: unless-stopped
