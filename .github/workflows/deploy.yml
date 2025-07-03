@@ -29,6 +29,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/deploy
+            git pull origin main
             docker-compose down
             docker-compose build --no-cache
             docker-compose up -d
