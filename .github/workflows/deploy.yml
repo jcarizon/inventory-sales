@@ -9,22 +9,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy using SSH and Git Pull
+      - name: SSH into EC2 and deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            echo "🚀 Connecting to EC2 and deploying..."
-
+            echo "🔁 Pulling latest code..."
             cd ~/deploy
+            git fetch origin
+            git reset --hard origin/main
 
-            echo "🔄 Resetting and pulling latest code..."
-            git reset --hard HEAD
-            git pull origin main
+            echo "📦 Installing dependencies..."
+            npm install
 
-            echo "🐳 Rebuilding and restarting containers..."
+            echo "⚙️ Building the app..."
+            npm run build
+
+            echo "🐳 Restarting containers..."
             docker-compose down
             docker-compose build --no-cache
             docker-compose up -d
