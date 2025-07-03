@@ -12,13 +12,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Copy files to EC2
+      - name: Install dependencies and build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+          cd ..
+
+      - name: Install backend dependencies (optional build step)
+        run: |
+          cd backend
+          npm ci
+          # Optional: npm run build if needed
+          cd ..
+
+      - name: Copy project to EC2
         uses: appleboy/scp-action@v0.1.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "."
+          source: "."  # copy everything including Dockerfile and compose
           target: "~/deploy"
 
       - name: SSH into EC2 and deploy
@@ -29,7 +43,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/deploy
-            git pull origin main
             docker-compose down
             docker-compose build --no-cache
-            docker-compose up -d
+            docker-compose up -d --remove-orphans
+            echo "Deployed at $(date)" > deployed.txt
